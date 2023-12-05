@@ -41,16 +41,20 @@ void draw() {
     if (movie.available()) {
         movie.read();
     }
+    float mouseYMapped = map(mouseY, 0, height, 0, 1.0);
     
-    
-    float distanceMapped = map(distance,0,69,0,1.0);
-    noise.set("interpolationValue", distanceMapped);
-    
-    print("Distance: ");
-    println(distance);
-    print("Distance Mapped: ");
-    println(distanceMapped);
-    println("");
+ 
+        
+        
+        float distanceMapped = map(read,0,69,0,1.0);
+        noise.set("interpolationValue", distanceMapped);
+        
+        print("Distance: ");
+        println(read);
+        print("Distance Mapped: ");
+        println(distanceMapped);
+        println("");
+
     
     
     //Draw the image on the scene
@@ -71,4 +75,3 @@ PVector randomVec2() {
     float y = random(0, 1);
     return new PVector(x, y);
 }
-
