@@ -1,7 +1,7 @@
 const int triggerPin = 9;
 const int responsePin = 10;
 
-const float speedOfSound = 0.034
+const float speedOfSound = 0.034;
 
 void setup() {
   pinMode(triggerPin, OUTPUT);
@@ -12,18 +12,19 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(trigPin, LOW);
+  digitalWrite(triggerPin, LOW);
   delayMicroseconds(2);
 
-  digitalWrite(trigPin, HIGH);
+  digitalWrite(triggerPin, HIGH);
   delayMicroseconds(10);
 
-  digitalWrite(trigPin, LOW);
+  digitalWrite(triggerPin, LOW);
 
-  long durationOfBounceBack = pulseIn(echoPin, HIGH);
+  long durationOfBounceBack = pulseIn(responsePin, HIGH);
 
-  int distance = (durationOfBounceBack * speedOfSound) / 2;
+  int distance = durationOfBounceBack * speedOfSound / 2;
   
   Serial.write(distance);
+  Serial.flush();
   delay(100);
 }
