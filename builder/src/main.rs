@@ -4,6 +4,9 @@ use std::{
     fmt::format,
     env,
     path::PathBuf,
+    os::windows::thread,
+    thread::sleep,
+    time::Duration,
 };
 use colored::Colorize;
 

@@ -13,25 +13,6 @@ uniform sampler2D texture;
 float rand(vec2 co) {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
-uint xorshift32(uint state) {
-    state ^= (state << 13);
-    state ^= (state >> 17);
-    state ^= (state << 5);
-    return state;
-}
-
-vec3 generateRandomColor(uint seed) {
-    // Use xorshift to generate a random number based on the seed
-    uint randomValue = xorshift32(seed);
-
-    // Normalize the random value to a range between 0 and 1
-    float normalizedRandom = float(randomValue) / float(uint(0xFFFFFFFF));
-
-    // Use the normalized random value to create a random color
-    vec3 randomColor = vec3(normalizedRandom, fract(normalizedRandom + 0.33), fract(normalizedRandom + 0.67));
-
-    return randomColor;
-}
 void main(void) {
 
     vec2 uv = gl_FragCoord.xy / sketchSize.xy;
