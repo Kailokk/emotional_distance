@@ -66,41 +66,7 @@ fn main() {
         return;
     }
 
-    print_success("Processing file succesfully built");
-
-    print_title("Launching processing sketch");
-    if let Some(mut child_process) = launch_processing(output_dir) {
-        match child_process.wait() {
-            Ok(status) =>
-                match status.success() {
-                    true => (),
-                    false => {
-                        eprintln!("Processing exited early due to an error");
-                        return;
-                    }
-                }
-            Err(error) => print_error(error.to_string().as_str()),
-        }
-    } else {
-        print_error("Couldnt start processing child process");
-        return;
-    }
-    /* if let Some(exit_status) = launch_processing(output_dir) {
-        match exit_status.success() {
-            true => (),
-            false => {
-                eprintln!("Processing exited early due to an error");
-                return;
-            }
-        }
-    } else {
-        eprintln!("Couldnt start processing-java");
-        return;
-    } */
-
-    loop {
-        print!("running");
-    }
+    print_success("Processing file succesfully built!");
 }
 
 fn compile_arduino() -> Option<ExitStatus> {
@@ -157,21 +123,6 @@ fn export_processing(sketch_dir: &PathBuf, output_dir: &PathBuf) -> Option<ExitS
     return None;
 }
 
-fn launch_processing(mut output_dir: PathBuf) -> Option<Child> {
-    // output_dir.push("processing_sketch.exe");
-    // println!("Command: {}", command.get_program().to_str().unwrap());
-    let result = Command::new(
-        "C:/Users/kailo/OneDrive/Desktop/GriefVideo/output/processing_sketch.exe"
-    ).spawn();
-    match result {
-        Ok(status) => {
-            return Some(status);
-        }
-        Err(error) => eprintln!("{}", error),
-    }
-    return None;
-}
-
 fn print_display_line() {
     println!("{}", "------------".blue());
 }
@@ -183,10 +134,13 @@ fn print_title(title: &str) {
 }
 
 fn print_success(success: &str) {
-    println!("{}", "~~~~~~~~~~~~".green());
-    println!("{}", success.green());
+    println!();
+    println!("~~~{}~~~", success.green());
+    println!();
 }
 
 fn print_error(error: &str) {
-    eprintln!("{}", error.red())
+    println!();
+    eprintln!("~~~{}~~~", error.red());
+    println!();
 }
