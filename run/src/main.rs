@@ -1,46 +1,91 @@
-use std::{ process::{ self, Command, Output, ExitStatus, Child }, io, fmt::format, env };
+use std::{
+    process::{ self, Command, Output, ExitStatus, Child },
+    io,
+    fmt::format,
+    env,
+    path::PathBuf,
+};
+use colored::Colorize;
+
 fn main() {
-    println!("------------");
-    println!("Compiling arduino code");
-    println!("------------");
+    print_title("Compiling arduino code");
     if let Some(exit_status) = compile_arduino() {
         match exit_status.success() {
             true => (),
             false => {
-                eprintln!("Arduino compilation failed");
+                print_error("Arduino compilation failed");
                 return;
             }
         }
     } else {
-        eprintln!("Couldnt start arduino compilation process");
+        print_error("Couldnt start arduino compilation process");
         return;
     }
-    println!("Arduino code compiled successfully");
+    print_success("Arduino code compiled successfully");
 
-    println!("------------");
-    println!("Uploading code to arduino unit");
-    println!("------------");
+    print_title("Uploading code to arduino unit");
     if let Some(exit_status) = upload_arduino() {
         match exit_status.success() {
             true => (),
             false => {
-                eprintln!("Arduino upload failed");
-                eprintln!("Please ensure the arduino is connected to the computer via a usb cable");
-                eprintln!("An orange light should be visible on the unit.");
+                print_error("Arduino upload failed");
+                print_error(
+                    "Please ensure the arduino is connected to the computer via a usb cable"
+                );
+                print_error("An orange light should be visible on the unit.");
                 return;
             }
         }
     } else {
-        eprintln!("Couldnt start arduino upload process");
+        print_error("Couldnt start arduino upload process");
         return;
     }
 
-    println!("Arduino code uploaded successfully");
+    print_success("Arduino code uploaded successfully");
 
-    println!("------------");
-    println!("Launching processing sketch");
-    println!("------------");
-    if let Some(exit_status) = launch_processing() {
+    let mut current_dir = env::current_dir().unwrap();
+    current_dir.pop();
+
+    let mut sketch_dir = current_dir.clone();
+    sketch_dir.push("processing_sketch");
+
+    let mut output_dir = current_dir.clone();
+    output_dir.push("output");
+
+    print_title("Building processing sketch");
+    if let Some(exit_status) = export_processing(&sketch_dir, &output_dir) {
+        match exit_status.success() {
+            true => (),
+            false => {
+                print_error("Processing build exited early due to an error");
+                return;
+            }
+        }
+    } else {
+        print_error("Couldnt start processing build process");
+        return;
+    }
+
+    print_success("Processing file succesfully built");
+
+    print_title("Launching processing sketch");
+    if let Some(mut child_process) = launch_processing(output_dir) {
+        match child_process.wait() {
+            Ok(status) =>
+                match status.success() {
+                    true => (),
+                    false => {
+                        eprintln!("Processing exited early due to an error");
+                        return;
+                    }
+                }
+            Err(error) => print_error(error.to_string().as_str()),
+        }
+    } else {
+        print_error("Couldnt start processing child process");
+        return;
+    }
+    /* if let Some(exit_status) = launch_processing(output_dir) {
         match exit_status.success() {
             true => (),
             false => {
@@ -51,6 +96,10 @@ fn main() {
     } else {
         eprintln!("Couldnt start processing-java");
         return;
+    } */
+
+    loop {
+        print!("running");
     }
 }
 
@@ -88,12 +137,16 @@ fn upload_arduino() -> Option<ExitStatus> {
     return None;
 }
 
-fn launch_processing() -> Option<ExitStatus> {
-    let mut current_dir = env::current_dir().unwrap();
-    current_dir.pop();
-    current_dir.push("processing_sketch");
-    let processing_path = format!("--sketch={}", current_dir.to_string_lossy());
-    let result = Command::new("processing-java").arg(processing_path).arg("--run").status();
+fn export_processing(sketch_dir: &PathBuf, output_dir: &PathBuf) -> Option<ExitStatus> {
+    let sketch_path = format!("--sketch={}", sketch_dir.to_string_lossy());
+    let output_path = format!("--output={}", output_dir.to_string_lossy());
+
+    let result = Command::new("processing-java")
+        .arg("--force")
+        .arg(sketch_path)
+        .arg(output_path)
+        .arg("--export")
+        .status();
 
     match result {
         Ok(status) => {
@@ -102,4 +155,38 @@ fn launch_processing() -> Option<ExitStatus> {
         Err(error) => eprintln!("{}", error),
     }
     return None;
+}
+
+fn launch_processing(mut output_dir: PathBuf) -> Option<Child> {
+    // output_dir.push("processing_sketch.exe");
+    // println!("Command: {}", command.get_program().to_str().unwrap());
+    let result = Command::new(
+        "C:/Users/kailo/OneDrive/Desktop/GriefVideo/output/processing_sketch.exe"
+    ).spawn();
+    match result {
+        Ok(status) => {
+            return Some(status);
+        }
+        Err(error) => eprintln!("{}", error),
+    }
+    return None;
+}
+
+fn print_display_line() {
+    println!("{}", "------------".blue());
+}
+
+fn print_title(title: &str) {
+    print_display_line();
+    println!("{}", title.cyan());
+    print_display_line();
+}
+
+fn print_success(success: &str) {
+    println!("{}", "~~~~~~~~~~~~".green());
+    println!("{}", success.green());
+}
+
+fn print_error(error: &str) {
+    eprintln!("{}", error.red())
 }
