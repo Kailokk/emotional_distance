@@ -1,4 +1,4 @@
-use std::{ process::{ self, Command, Output, ExitStatus, Child }, io };
+use std::{ process::{ self, Command, Output, ExitStatus, Child }, io, fmt::format, env };
 fn main() {
     println!("------------");
     println!("Compiling arduino code");
@@ -40,6 +40,18 @@ fn main() {
     println!("------------");
     println!("Launching processing sketch");
     println!("------------");
+    if let Some(exit_status) = launch_processing() {
+        match exit_status.success() {
+            true => (),
+            false => {
+                eprintln!("Processing exited early due to an error");
+                return;
+            }
+        }
+    } else {
+        eprintln!("Couldnt start processing-java");
+        return;
+    }
 }
 
 fn compile_arduino() -> Option<ExitStatus> {
@@ -76,4 +88,18 @@ fn upload_arduino() -> Option<ExitStatus> {
     return None;
 }
 
-fn launch_processing() {}
+fn launch_processing() -> Option<ExitStatus> {
+    let mut current_dir = env::current_dir().unwrap();
+    current_dir.pop();
+    current_dir.push("processing_sketch");
+    let processing_path = format!("--sketch={}", current_dir.to_string_lossy());
+    let result = Command::new("processing-java").arg(processing_path).arg("--run").status();
+
+    match result {
+        Ok(status) => {
+            return Some(status);
+        }
+        Err(error) => eprintln!("{}", error),
+    }
+    return None;
+}

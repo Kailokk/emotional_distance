@@ -8,11 +8,8 @@ String portname;
 Movie movie;
 Serial myPort;
 int distance;
-void setup() {
-    println("Hello");
-    printArray(Serial.list());
-    println("Hello");
-    
+
+void setup() {  
     fullScreen(P2D);
     noiseImage  = loadImage("noise.png");
     
