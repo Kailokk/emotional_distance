@@ -45,9 +45,8 @@ int calculateDistance(long pulseDuration) {
 }
 
 void printTestData(long sensorOne, long sensorTwo, long sensorThree) {
-/*   Serial.print("Left: ");
-  Serial.print(leftDuration * speedOfSound / 2);
-  Serial.print(", Right: ");
-  // Serial.print(rightDuration* speedOfSound / 2);
-  Serial.println(); */
+  Serial.println("Sensor One: " + sensorOne);
+  Serial.println("Sensor Two: " + sensorTwo);
+  Serial.println("Sensor Three: " + sensorTwo);
+  Serial.println("--------------------");
 }
