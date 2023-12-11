@@ -35,7 +35,7 @@ void setup() {
 void draw() {
     background(0);
     distance = lerp(distance,targetDistance,smoothingFactor);
-    
+   
     if (movie.available()) {
         movie.read();
     }
@@ -52,6 +52,7 @@ void draw() {
 
 void serialEvent(Serial p) {
     int rawDistance = p.read();
+     println(rawDistance);
     targetDistance = float(rawDistance);
 }
 

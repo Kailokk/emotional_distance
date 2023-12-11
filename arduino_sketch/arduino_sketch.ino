@@ -15,16 +15,29 @@ void setup() {
 }
 
 void loop() {
-  int distance = 99999999;
 
+int reads[sensorCount];
+ for (int x = 0; x < sensorCount; x++) {
+  digitalWrite(triggerPins[x], LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(triggerPins[x], HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(triggerPins[x], LOW);
+
+  long durationOfBounceBack = pulseIn(responsePins[x], HIGH);
+
+  reads[x] = durationOfBounceBack * speedOfSound / 2;
+ }
+
+  int distance = reads[0];
   for (int x = 0; x < sensorCount; x++) {
-    distance = min(distance, calculateDistance(readSensor(x)));
+  distance = min(distance,reads[x]);
   }
-
-
   Serial.write(distance);
   Serial.flush();
-  delay(100);
+  delay(100); 
 }
 
 long readSensor(int pinIndex) {
@@ -37,6 +50,8 @@ long readSensor(int pinIndex) {
   digitalWrite(triggerPins[pinIndex], LOW);
   long out = pulseIn(responsePins[pinIndex], HIGH);
   digitalWrite(responsePins[pinIndex], LOW);
+  delayMicroseconds(10);
+
   return out;
 }
 
@@ -44,9 +59,11 @@ int calculateDistance(long pulseDuration) {
   return pulseDuration * speedOfSound / 2;
 }
 
-void printTestData(long sensorOne, long sensorTwo, long sensorThree) {
-  Serial.println("Sensor One: " + sensorOne);
-  Serial.println("Sensor Two: " + sensorTwo);
-  Serial.println("Sensor Three: " + sensorTwo);
+void printTestData(int sensorIndex, int distance) {
+  Serial.print("Sensor ");
+  Serial.print(sensorIndex);
+  Serial.print(": ");
+  Serial.print(distance);
+  Serial.println();
   Serial.println("--------------------");
 }
