@@ -1,13 +1,4 @@
-use std::{
-    process::{ self, Command, Output, ExitStatus, Child },
-    io,
-    fmt::format,
-    env,
-    path::PathBuf,
-    os::windows::thread,
-    thread::sleep,
-    time::Duration,
-};
+use std::{ process::{ Command, ExitStatus }, env, path::PathBuf };
 use colored::Colorize;
 
 fn main() {
